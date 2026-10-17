@@ -40,7 +40,8 @@ doubao-book-zettelkasten/
 │   ├── 04-cards.md             #   卡片盒规范（类型/字段/命名/原子化）
 │   ├── 05-logseq.md            #   Logseq 落库（含入库前确认）与降级导入
 │   ├── 06-retrieval.md         #   检索支持（档位 A/B）
-│   └── 07-reverse-import.md    #   图库反向整理（嵌套上下文继承/清洗/导出）
+│   ├── 07-reverse-import.md    #   图库反向整理（嵌套上下文继承/清洗/导出）
+│   └── 08-cross-book-synthesis.md  # 跨书概念聚合（求同/存异/综合，5-tag 合并）
 ├── scripts/
 │   └── make_card.py            #   cards.json → 批量生成 Logseq 卡片
 └── assets/

@@ -16,7 +16,8 @@ cards.json 结构（数组）:
     "tags": ["思维模型", "塔勒布"],
     "quote": "原文金句...",       # quote 卡
     "content": "要点行1\n要点行2", # concept/method/question 卡正文（每行一个块）
-    "links": ["概念-预测之书-系统韧性"]  # [[双链]]，输出到"关联："二级缩进
+    "links": ["概念-预测之书-系统韧性",           # 纯双链
+              "概念-预测之书-反脆弱 | supports | 杠铃策略为其应用案例"]  # 语义化链接：页面名 | 关系类型 | reason
   }
 ]
 
@@ -67,6 +68,24 @@ def fallback_title(card: dict) -> str:
     return card.get('book', '卡片')
 
 
+def render_links(links: list) -> list:
+    """渲染关联子块；支持纯页面名与语义化 '页面名 | 关系类型 | reason' 两种格式。"""
+    out = []
+    for ln in links:
+        ln = str(ln).strip()
+        if not ln:
+            continue
+        parts = [p.strip() for p in ln.split('|')]
+        page = parts[0]
+        if len(parts) >= 3 and parts[1]:
+            rel = parts[1]
+            reason = ' '.join(parts[2:])
+            out.append(f"  - [[{page}]]（{rel}：{reason}）")
+        else:
+            out.append(f"  - [[{page}]]")
+    return out
+
+
 def render_card(card: dict, index: int) -> tuple[str, str]:
     ctype = card.get('type', 'quote')
     label = TYPE_LABELS.get(ctype, ctype)
@@ -110,8 +129,7 @@ def render_card(card: dict, index: int) -> tuple[str, str]:
                 lines.append(f"- {ln}")
     if card.get('links'):
         lines.append("- 关联：")
-        for ln in card['links']:
-            lines.append(f"  - [[{ln}]]")
+        lines.extend(render_links(card['links']))
 
     return filename, '\n'.join(lines) + '\n'
 
