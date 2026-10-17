@@ -1,6 +1,6 @@
 ---
 name: doubao-book-zettelkasten
-description: 书籍精读与卡片盒笔记工作流编排技能。当用户要求精读电子书（PDF/EPUB/MD/Word/TXT）、用费曼学习法解读书籍、提炼书中精华金句与知识点、按卢曼卡片盒笔记法（Zettelkasten）生成笔记、把读书笔记导入 Logseq 知识库、或说"精读这本书/解读这本书/把书存入Logseq/读书卡片入库/书籍知识库"时使用。负责全流程：格式解析→费曼精读→HTML 解读报告→Zettelkasten 卡片生成→Logseq 入库→检索支持。优先配合 doubao-learn-to-remember（费曼方法论）、html（解读报告）、doubao-visualization（报告内图表）、MinerU/pandoc（格式解析）使用。
+description: 书籍精读与卡片盒笔记工作流编排技能。当用户要求精读电子书（PDF/EPUB/MD/Word/TXT）、用费曼学习法解读书籍、提炼书中精华金句与知识点、按卢曼卡片盒笔记法（Zettelkasten）生成笔记、把读书笔记导入 Logseq 知识库、整理/导出/提炼 Logseq 图库中的既有笔记、或说"精读这本书/解读这本书/把书存入Logseq/读书卡片入库/书籍知识库/整理我的Logseq笔记"时使用。负责全流程：格式解析→费曼精读→HTML 解读报告→Zettelkasten 卡片生成→Logseq 入库（含用户确认）→检索支持→图库反向整理。优先配合 doubao-learn-to-remember（费曼方法论）、html（解读报告）、doubao-visualization（报告内图表）、MinerU/pandoc（格式解析）使用。
 ---
 
 # 书籍精读 × 卡片盒笔记工作流
@@ -9,7 +9,7 @@ description: 书籍精读与卡片盒笔记工作流编排技能。当用户要�
 
 ## 工作流（按序执行）
 
-触发后按 6 阶段推进；每阶段先读对应 `references/` 文件获取完整规范，再执行。
+触发后按 7 阶段推进；每阶段先读对应 `references/` 文件获取完整规范，再执行。
 
 ### 1. 输入解析 → Markdown 原文
 读 `references/01-parsing.md`。按格式选择解析器（PDF→MinerU，EPUB/DOCX→pandoc，MD/TXT 直读），产出 `01-原文/` 下统一 markdown。解析产物必须保留章节层级，供精读锚定来源。
@@ -29,11 +29,14 @@ description: 书籍精读与卡片盒笔记工作流编排技能。当用户要�
 ### 4. 卡片盒生成（Zettelkasten）
 读 `references/04-cards.md`。从精读产物提炼 4 类原子卡片：金句卡/概念卡/方法卡/疑问卡。用 `scripts/make_card.py` 批量生成，产出 `03-卡片/`。一卡一想法，必带来源，2~4 个对象标签，双向链接指向相关概念。
 
-### 5. Logseq 入库
-读 `references/05-logseq.md`。将卡片写入 Logseq 图库 `pages/`（书页+概念页+卡片页）；本机图库路径（`LOGSEQ_GRAPH` 或部署时填写的默认路径）可达时直接落库；不可达时降级输出到 `交付/logseq-import/` 供手动导入，并在交付说明中写清导入指引。
+### 5. Logseq 入库（含用户确认）
+读 `references/05-logseq.md`。生成卡片后先做**入库前确认（Precheck）**：向用户展示书名、卡片总数、按类型分布（金句/概念/方法/疑问）、1~2 句内容摘要与 2~3 张样例卡片；用户确认后才写入图库。本机图库路径（`LOGSEQ_GRAPH` 或部署时填写的默认路径）可达时直接落库到 `pages/`（书页+概念页+卡片页）；不可达时降级输出到 `交付/logseq-import/` 供手动导入，并在交付说明中写清导入指引。用户明确要求"直接入库/跳过确认"时可跳过确认。
 
 ### 6. 检索支持
 读 `references/06-retrieval.md`。默认档位 A：直接读图库文件回答；卡片超 500 张或用户明确要求语义检索时按档位 B（本地 RAG）搭建。
+
+### 7. 图库反向整理（Logseq → 卡片/导出）
+读 `references/07-reverse-import.md`。当用户要求整理、导出、提炼 Logseq 图库中的既有页面/笔记时：解析页面属性与 bullet 树，嵌套子块展开为独立卡片时继承全部祖先上下文；清洗系统噪声（`id::`/`block-tags::`/inline 标签），保留 `[[双链]]` 与 markdown 格式；产出可复用卡片或回写图库，来源元数据（作者/来源类型）一并保留。
 
 ## 交付物清单
 
@@ -49,3 +52,5 @@ description: 书籍精读与卡片盒笔记工作流编排技能。当用户要�
 - 卡片页闪卡格式：正文标题用 `### 标题 #card`（h3 + 空格 + #card），答案统一缩进下一级，多行直接换行（每行一个块）
 - Logseq 语法校验：`property::` 后必须有空格；`[[双链]]` 与 `#标签` 拼写正确
 - 原文不可达时不得编造书内容；如实告知并标注「待核」
+- 入库前必须向用户确认（摘要+数量+样例）；未确认不得写入图库
+- 反向整理时嵌套子块必须继承全部祖先上下文，不得丢失父子关系

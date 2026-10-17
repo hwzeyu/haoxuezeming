@@ -15,9 +15,13 @@ Markdown 原文（保留章节层级）
    │  ③ ④ 卡片盒生成（金句/概念/方法/疑问 四类原子卡片）
    ▼
 Logseq 原生笔记（pages/*.md，双链互联）
-   │  ⑤ ⑥ 入库 + 检索支持（直接读库 / 本地 RAG）
+   │  ⑤ 入库前用户确认 → 写入图库（Precheck）
+   ▼
+图库知识资产
+   │  ⑥ 检索支持（直接读库 / 本地 RAG）
    ▼
 以后向 AI 提问 → AI 从 Logseq 图库调取资料回答
+   │  ⑦ 反向整理（Logseq 既有笔记 → 卡片/导出，嵌套上下文继承）
 ```
 
 ---
@@ -26,7 +30,7 @@ Logseq 原生笔记（pages/*.md，双链互联）
 
 ```
 doubao-book-zettelkasten/
-├── SKILL.md                    # 技能主文件（触发词 + 六阶段编排 + 质量门）
+├── SKILL.md                    # 技能主文件（触发词 + 七阶段编排 + 质量门）
 ├── README.md                   # 本文档：环境、依赖、安装、用法
 ├── LICENSE                     # MIT
 ├── references/                 # 各阶段完整规范（Agent 执行时按需读取）
@@ -34,8 +38,9 @@ doubao-book-zettelkasten/
 │   ├── 02-feynman.md           #   费曼精读四步协议
 │   ├── 03-report.md            #   HTML 精读报告八必备章节
 │   ├── 04-cards.md             #   卡片盒规范（类型/字段/命名/原子化）
-│   ├── 05-logseq.md            #   Logseq 落库与降级导入
-│   └── 06-retrieval.md         #   检索支持（档位 A/B）
+│   ├── 05-logseq.md            #   Logseq 落库（含入库前确认）与降级导入
+│   ├── 06-retrieval.md         #   检索支持（档位 A/B）
+│   └── 07-reverse-import.md    #   图库反向整理（嵌套上下文继承/清洗/导出）
 ├── scripts/
 │   └── make_card.py            #   cards.json → 批量生成 Logseq 卡片
 └── assets/
@@ -61,7 +66,7 @@ doubao-book-zettelkasten/
 
 ## 依赖工具与插件
 
-按六阶段流水线所需，分三类列出。**核心必装**为灰色高亮项，其余为对应场景的增强项。
+按七阶段流水线所需，分三类列出。**核心必装**为灰色高亮项，其余为对应场景的增强项。
 
 ### ① 格式解析层
 
@@ -146,7 +151,9 @@ python3 <skills 目录>/skill-creator-for-work/scripts/quick_validate.py <技能
 - 「读书卡片入库」 / 「书籍知识库」
 - 「用费曼学习法精读 X」
 
-AI 将按 SKILL.md 六阶段自动执行，最终交付：
+**反向整理**（无需电子书，处理图库既有笔记）：「整理我的 Logseq 笔记」「把我的页面做成卡片」「导出这本书的笔记」。
+
+AI 将按 SKILL.md 七阶段自动执行，最终交付：
 
 ```
 01-原文/              解析后的 Markdown 原文（可回溯）
@@ -157,7 +164,7 @@ AI 将按 SKILL.md 六阶段自动执行，最终交付：
 交付/logseq-import/    Logseq 导入目录（图库不可达时的降级输出，含导入说明）
 ```
 
-Logseq 图库可达时（配置了 `LOGSEQ_GRAPH` 或本机默认图库路径存在），卡片**直接写入图库 `pages/`**（书页+概念页+卡片页一并落库，重启 Logseq 即索引）；不可达时输出 `交付/logseq-import/pages/`，用户手动并入图库即可。
+Logseq 图库可达时（配置了 `LOGSEQ_GRAPH` 或本机默认图库路径存在），卡片**直接写入图库 `pages/`**（书页+概念页+卡片页一并落库，重启 Logseq 即索引）；不可达时输出 `交付/logseq-import/pages/`，用户手动并入图库即可。**入库前会向你展示摘要（书名/卡片数/类型分布/样例）请求确认**，确认后才写入；也可要求"直接入库"跳过确认。
 
 ---
 
@@ -223,6 +230,8 @@ Logseq 原生属性语法（`property::` 后必须有空格）：
 - 卡片页闪卡格式：正文标题用 `### 标题 #card`（h3 + 空格 + #card），答案统一缩进下一级，多行直接换行（每行一个块）
 - Logseq 语法校验：`property::` 后必须有空格；`[[双链]]` 与 `#标签` 拼写正确
 - 原文不可达时不得编造书内容；如实告知并标注「待核」
+- 入库前必须向用户确认（摘要+数量+样例）；未确认不得写入图库
+- 反向整理时嵌套子块必须继承全部祖先上下文，不得丢失父子关系
 - HTML 报告交付前用 `html` 技能 shot.py 自检（0 blocker / 0 error / 0 warning）
 
 ---
